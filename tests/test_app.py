@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
+import pytest
 
 from app.core.config import Settings, get_settings
 from app.main import app
+from app.services.llm import LLMService
 
 
 client = TestClient(app)
@@ -54,3 +56,23 @@ def test_chat_accepts_google_provider() -> None:
     app.dependency_overrides.clear()
     assert response.status_code == 200
     assert response.json()["provider"] == "google"
+
+
+@pytest.mark.asyncio
+async def test_google_quota_error_returns_clean_message(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeGemini:
+        def __init__(self, **_: object) -> None:
+            pass
+
+        async def ainvoke(self, _: object) -> object:
+            raise RuntimeError("429 RESOURCE_EXHAUSTED")
+
+    import langchain_google_genai
+
+    monkeypatch.setattr(langchain_google_genai, "ChatGoogleGenerativeAI", FakeGemini)
+    answer, provider = await LLMService(
+        Settings(google_api_key="test-key", google_model="gemini-2.0-flash")
+    ).chat("hello", "google")
+
+    assert provider == "google"
+    assert "quota is exhausted" in answer
