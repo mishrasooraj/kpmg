@@ -31,12 +31,18 @@ class LLMService:
             from langchain_google_genai import ChatGoogleGenerativeAI
 
             model = ChatGoogleGenerativeAI(
-                model="gemini-1.5-flash",
+                model=self.settings.google_model,
                 temperature=0,
                 google_api_key=self.settings.google_api_key,
             )
-            response = await model.ainvoke([system, human])
-            return str(response.content), selected
+            try:
+                response = await model.ainvoke([system, human])
+                return str(response.content), selected
+            except Exception as exc:
+                return (
+                    f"Google Gemini request failed for model '{self.settings.google_model}': {exc}",
+                    selected,
+                )
 
         if selected == "openai" and self.settings.openai_api_key:
             from langchain_openai import ChatOpenAI

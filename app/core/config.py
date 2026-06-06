@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
     google_api_key: str | None = None
+    google_model: str = "gemini-2.0-flash"
     default_llm_provider: str = Field(default="google", pattern="^(openai|anthropic|google)$")
     azure_storage_connection_string: str | None = None
     azure_blob_container: str = "landing"
