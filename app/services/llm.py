@@ -27,6 +27,17 @@ class LLMService:
             response = await model.ainvoke([system, human])
             return str(response.content), selected
 
+        if selected == "google" and self.settings.google_api_key:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+
+            model = ChatGoogleGenerativeAI(
+                model="gemini-1.5-flash",
+                temperature=0,
+                google_api_key=self.settings.google_api_key,
+            )
+            response = await model.ainvoke([system, human])
+            return str(response.content), selected
+
         if selected == "openai" and self.settings.openai_api_key:
             from langchain_openai import ChatOpenAI
 
@@ -35,6 +46,6 @@ class LLMService:
             return str(response.content), selected
 
         return (
-            "LLM provider is not configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY to enable live chat.",
+            "LLM provider is not configured. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or GOOGLE_API_KEY to enable live chat.",
             selected,
         )

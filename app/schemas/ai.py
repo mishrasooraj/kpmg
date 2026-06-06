@@ -5,7 +5,7 @@ class ChatRequest(BaseModel):
     user_id: str = Field(min_length=1)
     message: str = Field(min_length=1)
     conversation_id: str | None = None
-    provider: str | None = Field(default=None, pattern="^(openai|anthropic)$")
+    provider: str | None = Field(default=None, pattern="^(openai|anthropic|google)$")
 
 
 class ChatResponse(BaseModel):

@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/kpmg"
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
-    default_llm_provider: str = Field(default="openai", pattern="^(openai|anthropic)$")
+    google_api_key: str | None = None
+    default_llm_provider: str = Field(default="google", pattern="^(openai|anthropic|google)$")
     azure_storage_connection_string: str | None = None
     azure_blob_container: str = "landing"
     log_level: str = "INFO"

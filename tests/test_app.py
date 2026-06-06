@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from app.core.config import Settings, get_settings
 from app.main import app
 
 
@@ -35,3 +36,21 @@ def test_pipeline_dry_run() -> None:
     )
     assert response.status_code == 200
     assert response.json()["status"] in {"dry_run", "queued"}
+
+
+def test_chat_accepts_google_provider() -> None:
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        google_api_key=None,
+        default_llm_provider="google",
+    )
+    response = client.post(
+        "/api/v1/ai/chat",
+        json={
+            "user_id": "sooraj",
+            "message": "Explain RAG in simple words",
+            "provider": "google",
+        },
+    )
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    assert response.json()["provider"] == "google"
